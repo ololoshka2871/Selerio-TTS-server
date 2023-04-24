@@ -7,8 +7,8 @@ import wave
 
 # https://github.com/snakers4/silero-models#text-to-speech
 class SileroTTS:
-    def __init__(self, language, model, model_file=None) -> None:
-        self._localfile = f'{language}_{model}.pt' if model_file is None else model_file
+    def __init__(self, language, model, model_store_path=".", model_file=None) -> None:
+        self._localfile = f'{model_store_path}/{language}_{model}.pt' if model_file is None else model_file
 
         # download model if not exists
         if not os.path.isfile(self._localfile):

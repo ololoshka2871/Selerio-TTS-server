@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
-import io
 import logging
-from aiohttp import web
 import functools
 import argparse
+import pathlib
 
+from aiohttp import web
 
 from TTS import SileroTTS
 
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 async def index(request: web.Request) -> web.Response:
     # show api documentation
-    return web.FileResponse('index.html')
+    return web.FileResponse(pathlib.Path(__file__).parent.resolve().joinpath('index.html'))
 
 
 async def say_get(tts: SileroTTS, request: web.Request) -> web.StreamResponse:
@@ -64,8 +64,8 @@ async def say_post(tts: SileroTTS, request: web.Request) -> web.StreamResponse:
     return response
 
 
-async def start_server(lang: str, model: str, port: int = 8961) -> web.Application:
-    tts = SileroTTS('ru', 'ru_v3')
+async def start_server(lang: str, model: str, model_path: str, port: int = 8961) -> web.Application:
+    tts = SileroTTS(lang, model, model_store_path=model_path)
 
     app = web.Application()
 
@@ -84,10 +84,11 @@ if __name__ == '__main__':
     )
     parser.add_argument('-p', '--port', type=int,
                         default=8961, help='Port to listen on')
+    parser.add_argument('-m', '--model-dir', type=str, default=None, help='Path to model directory')
     parser.add_argument('language', type=str, help='Voice language to load')
     parser.add_argument('voice_model', type=str, help='Voice model to load')
     args = parser.parse_args()
 
     logger.info(f'Starting server at http://localhost:{args.port}/')
 
-    web.run_app(start_server(args.language, args.voice_model), port=args.port)
+    web.run_app(start_server(args.language, args.voice_model, args.model_dir), port=args.port)
