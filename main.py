@@ -64,8 +64,8 @@ async def say_post(tts: SileroTTS, request: web.Request) -> web.StreamResponse:
     return response
 
 
-async def start_server(lang: str, model: str, model_path: str, port: int = 8961) -> web.Application:
-    tts = SileroTTS(lang, model, model_store_path=model_path)
+async def start_server(lang: str, model: str, model_path: str, device: str) -> web.Application:
+    tts = SileroTTS(lang, model, model_store_path=model_path, device=device)
 
     app = web.Application()
 
@@ -85,10 +85,11 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--port', type=int,
                         default=8961, help='Port to listen on')
     parser.add_argument('-m', '--model-dir', type=str, default=None, help='Path to model directory')
+    parser.add_argument('-d', '--device', type=str, default='cpu', help='torch device to use')
     parser.add_argument('language', type=str, help='Voice language to load')
     parser.add_argument('voice_model', type=str, help='Voice model to load')
     args = parser.parse_args()
 
     logger.info(f'Starting server at http://localhost:{args.port}/')
 
-    web.run_app(start_server(args.language, args.voice_model, args.model_dir), port=args.port)
+    web.run_app(start_server(args.language, args.voice_model, args.model_dir, args.device), port=args.port)
