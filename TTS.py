@@ -7,7 +7,7 @@ import wave
 
 # https://github.com/snakers4/silero-models#text-to-speech
 class SileroTTS:
-    def __init__(self, language, model, model_store_path=".", model_file=None) -> None:
+    def __init__(self, language, model, model_store_path=".", model_file=None, device: str = 'cpu') -> None:
         self._localfile = f'{model_store_path}/{language}_{model}.pt' if model_file is None else model_file
 
         # download model if not exists
@@ -15,8 +15,7 @@ class SileroTTS:
             torch.hub.download_url_to_file(f'https://models.silero.ai/models/tts/{language}/{model}.pt',
                                            self._localfile)
 
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        torch.set_num_threads(8)
+        device = torch.device(device)
 
         self._model = torch.package.PackageImporter(self._localfile).load_pickle(  # type: ignore
             "tts_models", "model")
